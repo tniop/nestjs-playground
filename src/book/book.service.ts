@@ -1,37 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { Book, Prisma } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Book } from '@prisma/client';
 import { DBService } from '../db.service';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Injectable()
 export class BookService {
-  constructor(private dbService: DBService) {}
+  constructor(private readonly dbService: DBService) {}
 
-  async getBook(id: Prisma.BookWhereUniqueInput): Promise<Book | null> {
-    return this.dbService.book.findUnique({
-      where: id,
-    });
+  async getBooks(): Promise<Book[]> {
+    const books = await this.dbService.book.findMany();
+    return books;
   }
 
-  async createBook(data: Prisma.BookCreateInput): Promise<Book> {
-    return this.dbService.book.create({
-      data,
+  async getBook(id: number): Promise<Book> {
+    const book = await this.dbService.book.findUnique({
+      where: {
+        id: id,
+      },
     });
+
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${id} not found.`);
+    }
+    return book;
   }
 
-  async updateBook(params: {
-    where: Prisma.BookWhereUniqueInput;
-    data: Prisma.BookUpdateInput;
-  }): Promise<Book> {
-    const { where, data } = params;
-    return this.dbService.book.update({
-      data,
-      where,
-    });
+  async createBook(bookData: CreateBookDto): Promise<Book> {
+    return await this.dbService.book.create({ data: bookData });
   }
 
-  async deleteBook(where: Prisma.BookWhereUniqueInput): Promise<Book> {
+  async updateBook(id: number, updateBookData: UpdateBookDto): Promise<Book> {
+    const book = await this.dbService.book.update({
+      where: {
+        id: id,
+      },
+      data: updateBookData,
+    });
+    return book;
+  }
+
+  async deleteBook(id: number): Promise<Book> {
     return this.dbService.book.delete({
-      where,
+      where: {
+        id: id,
+      },
     });
   }
 }

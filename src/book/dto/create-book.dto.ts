@@ -1,12 +1,16 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateBookDto {
   @IsString()
   readonly title: string;
 
-  @IsNumber()
+  @IsString()
   readonly author: string;
 
   @IsNumber()
   readonly publishYear: number;
+
+  @IsOptional()
+  @IsNumber()
+  readonly remain: number;
 }

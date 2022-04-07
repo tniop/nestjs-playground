@@ -9,51 +9,38 @@ import {
 } from '@nestjs/common';
 import { Book } from '@prisma/client';
 import { BookService } from './book.service';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
-@Controller()
+@Controller('books')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  @Get('books/:id')
-  async getBookById(@Param('id') id: string): Promise<Book> {
-    return this.bookService.getBook({ id: Number(id) });
+  @Get()
+  async getAll(): Promise<Book[]> {
+    return this.bookService.getBooks();
   }
 
-  @Post('books')
-  async createBook(
-    @Body() bookData: { title: string; author: string; publishYear: number },
-  ): Promise<Book> {
-    const { title, author } = bookData;
-    const publishYear = Number(bookData.publishYear);
-    return this.bookService.createBook({
-      title,
-      author,
-      publishYear,
-    });
+  @Get(':id')
+  async getBookById(@Param('id') id: number): Promise<Book> {
+    return this.bookService.getBook(id);
   }
 
-  @Put('books/:id')
+  @Post()
+  async createBook(@Body() bookData: CreateBookDto): Promise<Book> {
+    return this.bookService.createBook(bookData);
+  }
+
+  @Put(':id')
   async updateBook(
-    @Param('id') id: string,
-    @Body() bookData: { title: string; author: string; publishYear: number },
+    @Param('id') id: number,
+    @Body() updateBookData: UpdateBookDto,
   ): Promise<Book> {
-    const { title, author } = bookData;
-    const publishYear = Number(bookData.publishYear);
-
-    return this.bookService.updateBook({
-      where: { id: Number(id) },
-      data: {
-        title,
-        author,
-        publishYear,
-      },
-    });
+    return this.bookService.updateBook(id, updateBookData);
   }
 
-  @Delete('books/:id')
-  async deleteBook(@Param('id') id: string): Promise<Book> {
-    return this.bookService.deleteBook({
-      id: Number(id),
-    });
+  @Delete(':id')
+  deleteBook(@Param('id') id: number): Promise<Book> {
+    return this.bookService.deleteBook(id);
   }
 }
