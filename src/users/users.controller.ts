@@ -20,15 +20,15 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.userService.users();
-  // }
+  @Get()
+  findAll() {
+    return this.userService.getAllUsers();
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.userService.user(+id);
-  // }
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.userService.getUser(id);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
