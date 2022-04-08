@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `Book` MODIFY `remain` INTEGER;
+ALTER TABLE `Book` MODIFY `remain` INTEGER NOT NULL;
