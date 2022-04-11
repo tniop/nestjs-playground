@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PostService } from './posts.service';
-import { PostsController } from './posts.controller';
+import { PostController } from './posts.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-  controllers: [PostsController],
+  controllers: [PostController],
   providers: [PostService, PrismaService],
 })
 export class PostsModule {}
