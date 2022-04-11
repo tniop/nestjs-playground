@@ -2,7 +2,7 @@ import { Post } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString() //unique설정해야함
+  @IsString()
   readonly email: string;
 
   @IsOptional()
