@@ -1,15 +1,12 @@
 import { Post } from '@prisma/client';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
-  @IsNumber()
-  readonly id: number;
-
   @IsString() //unique설정해야함
   readonly email: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsString()
   readonly name: string;
 
   @IsOptional()
