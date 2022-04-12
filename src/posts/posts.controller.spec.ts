@@ -88,7 +88,7 @@ describe('PostController', () => {
   describe('remove', () => {
     it('delete a post ', async () => {
       const beforeDelete = (await controller.findAll()).length;
-      await controller.remove(43); // db 확인
+      await controller.remove(102); // db 확인
       const afterDelete = (await controller.findAll()).length;
       expect(afterDelete).toBeLessThan(beforeDelete);
     });

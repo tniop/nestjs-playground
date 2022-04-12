@@ -102,7 +102,7 @@ describe('PostService', () => {
   describe('deletePost', () => {
     it('delete a post ', async () => {
       const beforeDelete = (await service.getAllPosts()).length;
-      await service.deletePost(44); // db 확인
+      await service.deletePost(103); // db 확인
       const afterDelete = (await service.getAllPosts()).length;
       expect(afterDelete).toBeLessThan(beforeDelete);
     });
