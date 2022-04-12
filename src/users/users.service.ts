@@ -10,7 +10,7 @@ export class UserService {
   constructor(private readonly PrismaService: PrismaService) {}
 
   async createUser(userData: CreateUserDto): Promise<User> {
-    return this.PrismaService.user.create({ data: userData });
+    return await this.PrismaService.user.create({ data: userData });
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -23,14 +23,22 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found.`);
+      throw new NotFoundException(`User ID ${id} not found.`);
     }
 
     return user;
   }
 
   async updateUser(id: number, userData: UpdateUserDto): Promise<User> {
-    return this.PrismaService.user.update({
+    const user = await this.PrismaService.user.findUnique({
+      where: { id: id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ID ${id} not found.`);
+    }
+
+    return await this.PrismaService.user.update({
       where: {
         id: id,
       },
@@ -39,7 +47,15 @@ export class UserService {
   }
 
   async deleteUser(id: number): Promise<User> {
-    return this.PrismaService.user.delete({
+    const user = await this.PrismaService.user.findUnique({
+      where: { id: id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ID ${id} not found.`);
+    }
+
+    return await this.PrismaService.user.delete({
       where: {
         id: id,
       },
