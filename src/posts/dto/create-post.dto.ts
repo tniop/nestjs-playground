@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
@@ -13,5 +12,5 @@ export class CreatePostDto {
   readonly published: boolean;
 
   @IsOptional()
-  readonly author: User;
+  readonly authorId: number;
 }

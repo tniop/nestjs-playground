@@ -1,13 +1,15 @@
-import { IsOptional, IsString } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+// import { IsOptional, IsString } from 'class-validator';
+import { CreatePostDto } from './create-post.dto';
 
-export class UpdatePostDto {
-  @IsString()
-  readonly title: string;
+export class UpdatePostDto extends PartialType(CreatePostDto) {}
 
-  @IsOptional()
-  @IsString()
-  readonly content: string;
+// @IsString()
+// readonly title: string;
 
-  @IsOptional()
-  readonly published: boolean;
-}
+// @IsOptional()
+// @IsString()
+// readonly content: string;
+
+// @IsOptional()
+// readonly published: boolean;

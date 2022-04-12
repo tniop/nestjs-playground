@@ -10,7 +10,16 @@ export class PostService {
   constructor(private readonly PrismaService: PrismaService) {}
 
   async createPost(postData: CreatePostDto): Promise<Post> {
-    return this.PrismaService.post.create({ data: postData });
+    const userId = postData.authorId;
+    const user = await this.PrismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ID ${userId} not found.`);
+    }
+
+    return await this.PrismaService.post.create({ data: postData });
   }
 
   async getAllPosts(): Promise<Post[]> {
@@ -23,14 +32,22 @@ export class PostService {
     });
 
     if (!post) {
-      throw new NotFoundException(`Post with ID ${id} not found.`);
+      throw new NotFoundException(`Post ID ${id} not found.`);
     }
 
     return post;
   }
 
   async updatePost(id: number, postData: UpdatePostDto): Promise<Post> {
-    return this.PrismaService.post.update({
+    const postId = await this.PrismaService.post.findUnique({
+      where: { id: id },
+    });
+
+    if (!postId) {
+      throw new NotFoundException(`Post ID ${id} not found.`);
+    }
+
+    return await this.PrismaService.post.update({
       where: {
         id: id,
       },
@@ -39,7 +56,15 @@ export class PostService {
   }
 
   async deletePost(id: number): Promise<Post> {
-    return this.PrismaService.post.delete({
+    const postId = await this.PrismaService.post.findUnique({
+      where: { id: id },
+    });
+
+    if (!postId) {
+      throw new NotFoundException(`Post ID ${id} not found.`);
+    }
+
+    return await this.PrismaService.post.delete({
       where: {
         id: id,
       },
@@ -47,7 +72,15 @@ export class PostService {
   }
 
   async getPostByUserId(userId: number): Promise<Post[]> {
-    return this.PrismaService.post.findMany({
+    const user = await this.PrismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ID ${userId} not found.`);
+    }
+
+    return await this.PrismaService.post.findMany({
       where: {
         authorId: userId,
       },
