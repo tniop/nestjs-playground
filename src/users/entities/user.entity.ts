@@ -12,6 +12,8 @@ export class User {
   @Column({ length: 30, nullable: true })
   name: string;
 
-  @OneToMany(() => Post, (post) => post.id)
+  @OneToMany(() => Post, (post) => post.user, {
+    cascade: true,
+  })
   posts: Post[];
 }

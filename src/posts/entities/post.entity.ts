@@ -6,7 +6,7 @@ export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, length: 30 })
+  @Column({ length: 30 })
   title: string;
 
   @Column({ length: 30, nullable: true })
@@ -15,6 +15,6 @@ export class Post {
   @Column({ nullable: true, default: false })
   published: boolean;
 
-  @ManyToOne(() => User, (user) => user.id)
-  authorId: number;
+  @ManyToOne(() => User, (user) => user.posts)
+  user: User;
 }

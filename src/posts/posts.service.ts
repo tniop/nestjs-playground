@@ -13,12 +13,11 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto): Promise<Post> {
-    const { title, content, published, authorId } = createPostDto;
+    const { title, content, published } = createPostDto;
     const post = this.postsRepository.create({
       title,
       content,
       published,
-      authorId,
     });
     await this.postsRepository.save(post);
     return post;
@@ -45,11 +44,10 @@ export class PostsService {
       throw new NotFoundException(`Post ID ${id} not found.`);
     }
 
-    const { title, content, published, authorId } = updatePostDto;
+    const { title, content, published } = updatePostDto;
     post.title = title;
     post.content = content;
     post.published = published;
-    post.authorId = authorId;
 
     return await this.postsRepository.save(post);
   }
