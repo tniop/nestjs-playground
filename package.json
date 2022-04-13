@@ -1,5 +1,5 @@
 {
-  "name": "nestjs-typeorm",
+  "name": "prac",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -26,7 +26,6 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/typeorm": "^8.0.3",
-    "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
