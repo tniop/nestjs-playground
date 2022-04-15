@@ -31,7 +31,7 @@ describe('AppController (e2e)', () => {
       return await request(app.getHttpServer())
         .post('/users')
         .send({
-          email: 'e2eTest7@test.com', // db 확인
+          email: 'e2eTest11@test.com', // db 확인
           name: 'e2eTest',
         })
         .expect(201);
@@ -49,7 +49,7 @@ describe('AppController (e2e)', () => {
 
     it('DELETE 200', () => {
       // db 확인
-      return request(app.getHttpServer()).delete('/users/47').expect(200);
+      return request(app.getHttpServer()).delete('/users/8').expect(200);
     });
 
     it('GET 200', () => {
@@ -62,7 +62,7 @@ describe('AppController (e2e)', () => {
 
     it('PATCH 200', () => {
       return request(app.getHttpServer())
-        .patch('/users/2')
+        .patch('/users/6')
         .send({ name: 'e2eUpdateTest' })
         .expect(200);
     });
@@ -99,7 +99,7 @@ describe('AppController (e2e)', () => {
 
     it('DELETE 200', () => {
       // db 확인
-      return request(app.getHttpServer()).delete('/posts/84').expect(200);
+      return request(app.getHttpServer()).delete('/posts/9').expect(200);
     });
 
     it('GET 200', () => {
