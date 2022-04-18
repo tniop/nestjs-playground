@@ -39,4 +39,14 @@ export class UserController {
   remove(@Param('id') id: number) {
     return this.userService.deleteUser(id);
   }
+
+  @Get('posts/:id')
+  getPostByUserId(@Param('id') userId: number) {
+    return this.userService.getPostByUserId(userId);
+  }
+
+  @Get('posts/title/:id')
+  getPostTitleByUserId(@Param('id') userId: number) {
+    return this.userService.getPostTitleByUserId(userId);
+  }
 }

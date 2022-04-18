@@ -39,9 +39,4 @@ export class PostController {
   remove(@Param('id') id: number) {
     return this.postService.deletePost(id);
   }
-
-  @Get('posts/:id')
-  getPostByUserId(@Param('id') userId: number) {
-    return this.postService.getPostByUserId(userId);
-  }
 }

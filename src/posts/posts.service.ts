@@ -70,20 +70,4 @@ export class PostService {
       },
     });
   }
-
-  async getPostByUserId(userId: number): Promise<Post[]> {
-    const user = await this.PrismaService.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User ID ${userId} not found.`);
-    }
-
-    return await this.PrismaService.post.findMany({
-      where: {
-        authorId: userId,
-      },
-    });
-  }
 }

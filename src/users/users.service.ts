@@ -61,4 +61,38 @@ export class UserService {
       },
     });
   }
+
+  async getPostByUserId(userId: number): Promise<User> {
+    const user = await this.PrismaService.user.findUnique({
+      where: { id: userId },
+      include: {
+        posts: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ID ${userId} not found.`);
+    }
+
+    return user;
+  }
+
+  async getPostTitleByUserId(userId: number): Promise<User> {
+    const user = await this.PrismaService.user.findUnique({
+      where: { id: userId },
+      include: {
+        posts: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User ID ${userId} not found.`);
+    }
+
+    return user;
+  }
 }
