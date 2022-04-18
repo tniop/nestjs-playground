@@ -70,4 +70,38 @@ export class PostService {
       },
     });
   }
+
+  async getUserByPostId(postId: number): Promise<Post> {
+    const post = await this.PrismaService.post.findUnique({
+      where: { id: postId },
+      include: {
+        author: true,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post ID ${postId} not found.`);
+    }
+
+    return post;
+  }
+
+  async getUserNameByPostId(postId: number): Promise<Post> {
+    const post = await this.PrismaService.post.findUnique({
+      where: { id: postId },
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post ID ${postId} not found.`);
+    }
+
+    return post;
+  }
 }

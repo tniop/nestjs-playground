@@ -41,6 +41,7 @@ describe('AppController (e2e)', () => {
       return await request(app.getHttpServer())
         .post('/users')
         .send({
+          id: 1,
           email: 'e2eTest1@test.com', // db 확인
           name: 'e2eTest',
         })
@@ -51,6 +52,7 @@ describe('AppController (e2e)', () => {
       return await request(app.getHttpServer())
         .post('/users')
         .send({
+          id: 1,
           email: 'e2eTest1@test.com',
           name: 123,
         })
@@ -60,6 +62,7 @@ describe('AppController (e2e)', () => {
     it('DELETE 200', async () => {
       // db 확인
       await request(app.getHttpServer()).post('/users').send({
+        id: 2,
         email: 'e2eTest2@test.com',
         name: 'e2eTest',
       });
