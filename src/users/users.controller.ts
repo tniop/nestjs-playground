@@ -10,6 +10,7 @@ import {
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 
 @Controller('users')
 export class UserController {
@@ -48,5 +49,13 @@ export class UserController {
   @Get('posts/title/:id')
   getPostTitleByUserId(@Param('id') userId: number) {
     return this.userService.getPostTitleByUserId(userId);
+  }
+
+  @Post('posts')
+  createUserAndPost(
+    @Body() data: [userData: CreateUserDto, postData: CreatePostDto],
+  ) {
+    const [userData, postData] = data;
+    return this.userService.createUserAndPost(userData, postData);
   }
 }

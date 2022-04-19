@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 
 @Injectable()
 export class UserService {
@@ -94,5 +95,34 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async createUserAndPost(
+    userData: CreateUserDto,
+    postData: CreatePostDto,
+  ): Promise<User> {
+    const userAndPost = await this.PrismaService.user.create({
+      data: {
+        ...userData,
+        posts: {
+          create: [postData],
+        },
+      },
+      include: { posts: true },
+    });
+    // const { id: uId, email, name } = userData;
+    // const { id: pId, title, content, published } = postData;
+    // const userAndPost = await this.PrismaService.user.create({
+    //   data: {
+    //     id: uId,
+    //     email,
+    //     name,
+    //     posts: {
+    //       create: [{ id: pId, title, content, published }],
+    //     },
+    //   },
+    //   include: { posts: true },
+    // });
+    return userAndPost;
   }
 }
