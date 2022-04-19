@@ -97,15 +97,12 @@ export class UserService {
     return user;
   }
 
-  async createUserAndPost(
-    userData: CreateUserDto,
-    postData: CreatePostDto,
-  ): Promise<User> {
+  async createUserAndPosts(userData: CreateUserDto, postDatas): Promise<User> {
     const userAndPost = await this.PrismaService.user.create({
       data: {
         ...userData,
         posts: {
-          create: [postData],
+          create: [...postDatas],
         },
       },
       include: { posts: true },

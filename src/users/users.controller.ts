@@ -52,10 +52,10 @@ export class UserController {
   }
 
   @Post('posts')
-  createUserAndPost(
-    @Body() data: [userData: CreateUserDto, postData: CreatePostDto],
+  createUserAndPosts(
+    @Body() data: [userData: CreateUserDto, postDatas: CreatePostDto[]],
   ) {
-    const [userData, postData] = data;
-    return this.userService.createUserAndPost(userData, postData);
+    const [userData, postDatas] = data;
+    return this.userService.createUserAndPosts(userData, postDatas);
   }
 }
