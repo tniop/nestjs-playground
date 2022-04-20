@@ -2,18 +2,18 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsNumber()
-  readonly id: number;
+  id: number;
 
   @IsString()
-  readonly title: string;
+  title: string;
 
   @IsOptional()
   @IsString()
-  readonly content: string;
+  content: string;
 
   @IsOptional()
-  readonly published: boolean;
+  published: boolean;
 
   @IsOptional()
-  readonly authorId: number;
+  authorId: number;
 }
