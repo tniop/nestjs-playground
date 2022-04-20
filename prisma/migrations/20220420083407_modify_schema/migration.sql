@@ -1,0 +1,8 @@
+
+ALTER TABLE `posts` DROP FOREIGN KEY `posts_author_id_fkey`;
+
+-- AlterTable
+ALTER TABLE `posts` MODIFY `id` INTEGER NOT NULL AUTO_INCREMENT;
+
+-- AlterTable
+ALTER TABLE `users` MODIFY `id` INTEGER NOT NULL AUTO_INCREMENT;

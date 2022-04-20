@@ -1,5 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,8 +9,17 @@ import { UserService } from './users.service';
 
 describe('UsersController', () => {
   let controller: UserController;
+  const prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  });
 
-  beforeEach(async () => {
+  beforeAll(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.post.deleteMany({});
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [UserService, PrismaService],
@@ -23,16 +33,32 @@ describe('UsersController', () => {
   });
 
   describe('create', () => {
-    const requestDto: CreateUserDto = {
-      email: 'controllerTest1@test.com', // db 확인
-      name: 'controllerTest',
-    };
-
     it('should create a user', async () => {
-      const beforeCreate = (await controller.findAll()).length;
-      await controller.create(requestDto);
-      const afterCreate = (await controller.findAll()).length;
-      expect(afterCreate).toBeGreaterThan(beforeCreate);
+      const requestDto: CreateUserDto = {
+        id: 1,
+        email: 'userControllerTest1@test.com',
+        name: 'userControllerTest',
+      };
+
+      expect((await controller.findAll()).length).toEqual(0);
+      const result = await controller.create(requestDto);
+      expect(result).toEqual(requestDto);
+      expect((await controller.findAll()).length).toEqual(1);
+    });
+
+    it('should fail if user email exists', async () => {
+      const failRequestDto: CreateUserDto = {
+        id: 2,
+        email: 'userControllerTest1@test.com',
+        name: 'userControllerTest',
+      };
+
+      expect((await controller.findAll()).length).toEqual(1);
+      try {
+        await controller.create(failRequestDto);
+      } catch (e) {
+        expect((await controller.findAll()).length).toEqual(1);
+      }
     });
   });
 
@@ -47,10 +73,11 @@ describe('UsersController', () => {
     it('should return a user', async () => {
       const user = await controller.findOne(1);
       expect(user).toBeDefined();
-      expect(user.id).toEqual(1);
+      expect(user.email).toEqual('userControllerTest1@test.com');
+      expect(user.name).toEqual('userControllerTest');
     });
 
-    it('should throw a NotFoundException', async () => {
+    it('should throw a NotFoundException if userId not exist', async () => {
       try {
         await controller.findOne(999);
       } catch (e) {
@@ -62,17 +89,19 @@ describe('UsersController', () => {
 
   describe('update', () => {
     const requestDto: UpdateUserDto = {
+      id: 1,
       email: 'controllerUpdateTest@test.com',
       name: 'controllerUpdateTest',
     };
 
     it('should update a user', async () => {
-      await controller.update(2, requestDto);
-      const user = controller.findOne(2);
-      expect((await user).email).toEqual('controllerUpdateTest@test.com');
+      await controller.update(1, requestDto);
+      const user = await controller.findOne(1);
+      expect(user.email).toEqual('controllerUpdateTest@test.com');
+      expect(user.name).toEqual('controllerUpdateTest');
     });
 
-    it('should throw a NotFoundException', async () => {
+    it('should throw a NotFoundException if userId not exist', async () => {
       try {
         await controller.update(999, requestDto);
       } catch (e) {
@@ -82,15 +111,21 @@ describe('UsersController', () => {
     });
   });
 
-  describe('remove', () => {
-    it('delete a user ', async () => {
-      const beforeDelete = (await controller.findAll()).length;
-      await controller.remove(15); // db 확인
-      const afterDelete = (await controller.findAll()).length;
-      expect(afterDelete).toBeLessThan(beforeDelete);
+  describe('delete', () => {
+    it('should delete a user', async () => {
+      const beforeRemove = (await controller.findAll()).length;
+      await controller.remove(1);
+      const afterRemove = (await controller.findAll()).length;
+      expect(afterRemove - beforeRemove).toEqual(-1);
+      try {
+        await controller.remove(1);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual('User ID 1 not found.');
+      }
     });
 
-    it('should throw a NotFoundException', async () => {
+    it('should throw a NotFoundException if userId not exist', async () => {
       try {
         await controller.remove(999);
       } catch (e) {
