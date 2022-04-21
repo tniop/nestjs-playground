@@ -21,7 +21,6 @@ export class PostController {
   @Post()
   @UsePipes(new CreatePostDtoSnakeToCamelCasePipe())
   create(@Body() createPostDto: CreatePostDto) {
-    console.log(createPostDto);
     return this.postService.createPost(createPostDto);
   }
 

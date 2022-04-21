@@ -87,11 +87,11 @@ describe('UserService Unit Test', () => {
   describe('getUser', () => {
     it('should return a user', async () => {
       const users = await userService.getAllUsers();
-      const user = await userService.getUser(users[0].id);
+      const result = await userService.getUser(users[0].id);
 
-      expect(user.id).toBeDefined();
-      expect(user.email).toEqual('test1@test.com');
-      expect(user.name).toEqual('user1');
+      expect(result.id).toBeDefined();
+      expect(result.email).toEqual('test1@test.com');
+      expect(result.name).toEqual('user1');
     });
 
     it('should throw a NotFoundException if userId not exist', async () => {
@@ -209,7 +209,7 @@ describe('UserService Unit Test', () => {
   describe('getPostByUserId', () => {
     it('should return a user with posts', async () => {
       const users = await userService.getAllUsers();
-      const user = await userService.getPostByUserId(users[0].id);
+      const result = await userService.getPostByUserId(users[0].id);
       const posts = await postService.getAllPosts();
 
       const tempData = {
@@ -234,7 +234,7 @@ describe('UserService Unit Test', () => {
         ],
       };
 
-      expect(user).toEqual(tempData);
+      expect(result).toEqual(tempData);
     });
 
     it('should throw a NotFoundException if userId not exist', async () => {
@@ -250,7 +250,7 @@ describe('UserService Unit Test', () => {
   describe('getPostTitleByUserId', () => {
     it('should return a user with posts title', async () => {
       const users = await userService.getAllUsers();
-      const user = await userService.getPostTitleByUserId(users[0].id);
+      const result = await userService.getPostTitleByUserId(users[0].id);
 
       const tempData = {
         id: users[0].id,
@@ -266,7 +266,7 @@ describe('UserService Unit Test', () => {
         ],
       };
 
-      expect(user).toEqual(tempData);
+      expect(result).toEqual(tempData);
     });
 
     it('should throw a NotFoundException if userId not exist', async () => {

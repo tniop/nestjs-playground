@@ -6,8 +6,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostService } from './posts.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
-describe('PostService', () => {
+describe('PostService Unit Test', () => {
   let userService: UserService;
   let postService: PostService;
 
@@ -29,6 +30,13 @@ describe('PostService', () => {
 
     userService = module.get<UserService>(UserService);
     postService = module.get<PostService>(PostService);
+
+    const userInit: CreateUserDto = {
+      email: 'test@test.com',
+      name: 'test',
+    };
+
+    await userService.createUser(userInit);
   });
 
   afterAll(async () => {
@@ -40,117 +48,192 @@ describe('PostService', () => {
     expect(postService).toBeDefined();
   });
 
-  // describe('createPost', () => {
-  //   const requestDto: CreatePostDto = {
-  //     id: 1,
-  //     title: 'service_create_test_title',
-  //     content: 'service_create_test_content',
-  //     published: true,
-  //     authorId: 1,
-  //   };
+  describe('createPost', () => {
+    it('should create a post', async () => {
+      const users = await userService.getAllUsers();
+      const requestDto: CreatePostDto = {
+        title: 'title 01',
+        content: 'content 01',
+        published: true,
+        authorId: users[0].id,
+      };
 
-  //   const badRequestDto: CreatePostDto = {
-  //     title: 'service_create_test_title',
-  //     content: 'service_create_test_content',
-  //     published: true,
-  //     authorId: 999,
-  //   };
+      const beforeCreate = (await postService.getAllPosts()).length;
+      const result = await postService.createPost(requestDto);
+      const afterCreate = (await postService.getAllPosts()).length;
+      const posts = await postService.getAllPosts();
 
-  //   it('should create a post', async () => {
-  //     const beforeCreate = (await service.getAllPosts()).length;
-  //     await service.createPost(requestDto);
-  //     const afterCreate = (await service.getAllPosts()).length;
-  //     expect(afterCreate).toBeGreaterThan(beforeCreate);
-  //   });
+      expect(result.id).toEqual(posts[0].id);
+      expect(result.title).toEqual(requestDto.title);
+      expect(result.content).toEqual(requestDto.content);
+      expect(result.published).toEqual(requestDto.published);
+      expect(result.authorId).toEqual(requestDto.authorId);
+      expect(afterCreate - beforeCreate).toEqual(1);
+    });
 
-  //   it('should throw a NotFoundException', async () => {
-  //     try {
-  //       await service.createPost(badRequestDto);
-  //     } catch (e) {
-  //       expect(e).toBeInstanceOf(NotFoundException);
-  //       expect(e.message).toEqual('User ID 999 not found.');
-  //     }
-  //   });
-  // });
+    it('should throw a NotFoundException if userId not exist', async () => {
+      const requestDto: CreatePostDto = {
+        title: 'title 01',
+        content: 'content 01',
+        published: true,
+        authorId: 0,
+      };
 
-  // describe('getAllPosts', () => {
-  //   it('should return an array of posts', async () => {
-  //     const result = await service.getAllPosts();
-  //     expect(result).toBeInstanceOf(Array);
-  //   });
-  // });
+      try {
+        await postService.createPost(requestDto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual('User ID 0 not found.');
+      }
+    });
+  });
 
-  // describe('getPost', () => {
-  //   it('should return a post', async () => {
-  //     const post = await service.getPost(1);
-  //     expect(post).toBeDefined();
-  //     expect(post.id).toEqual(1);
-  //   });
+  describe('getAllPosts', () => {
+    it('should return an array of posts', async () => {
+      const result = await postService.getAllPosts();
+      expect(result).toBeInstanceOf(Array);
+    });
+  });
 
-  //   it('should throw a NotFoundException', async () => {
-  //     try {
-  //       await service.getPost(999);
-  //     } catch (e) {
-  //       expect(e).toBeInstanceOf(NotFoundException);
-  //       expect(e.message).toEqual('Post ID 999 not found.');
-  //     }
-  //   });
-  // });
+  describe('getPost', () => {
+    it('should return a post', async () => {
+      const posts = await postService.getAllPosts();
+      const result = await postService.getPost(posts[0].id);
+      const users = await userService.getAllUsers();
 
-  // describe('updatePost', () => {
-  //   const requestDto: UpdatePostDto = {
-  //     title: 'service_update_test_title',
-  //     content: 'service_update_test_content',
-  //     published: true,
-  //   };
+      expect(result.id).toBeDefined();
+      expect(result.title).toEqual('title 01');
+      expect(result.content).toEqual('content 01');
+      expect(result.published).toEqual(true);
+      expect(result.authorId).toEqual(users[0].id);
+    });
 
-  //   it('should update a post', async () => {
-  //     await service.updatePost(2, requestDto);
-  //     const post = service.getPost(2);
-  //     expect((await post).title).toEqual('service_update_test_title');
-  //   });
+    it('should throw a NotFoundException if postId not exist', async () => {
+      try {
+        await postService.getPost(0);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual('Post ID 0 not found.');
+      }
+    });
+  });
 
-  //   it('should throw a NotFoundException', async () => {
-  //     try {
-  //       await service.updatePost(999, requestDto);
-  //     } catch (e) {
-  //       expect(e).toBeInstanceOf(NotFoundException);
-  //       expect(e.message).toEqual('Post ID 999 not found.');
-  //     }
-  //   });
-  // });
+  describe('updatePost', () => {
+    const requestDto: UpdatePostDto = {
+      title: 'title 011',
+      content: 'content 011',
+      published: false,
+    };
 
-  // describe('deletePost', () => {
-  //   it('delete a post ', async () => {
-  //     const beforeDelete = (await service.getAllPosts()).length;
-  //     await service.deletePost(103); // db 확인
-  //     const afterDelete = (await service.getAllPosts()).length;
-  //     expect(afterDelete).toBeLessThan(beforeDelete);
-  //   });
+    it('should update a post', async () => {
+      const posts = await postService.getAllPosts();
+      const result = await postService.updatePost(posts[0].id, requestDto);
 
-  //   it('should throw a NotFoundException', async () => {
-  //     try {
-  //       await service.deletePost(999);
-  //     } catch (e) {
-  //       expect(e).toBeInstanceOf(NotFoundException);
-  //       expect(e.message).toEqual('Post ID 999 not found.');
-  //     }
-  //   });
-  // });
+      expect(result.id).toEqual(posts[0].id);
+      expect(result.title).toEqual(requestDto.title);
+      expect(result.content).toEqual(requestDto.content);
+      expect(result.published).toEqual(requestDto.published);
+    });
 
-  // describe('getPostByUserId', () => {
-  //   it('should return an array of posts', async () => {
-  //     const result = await service.getPostByUserId(1);
-  //     expect(result).toBeInstanceOf(Array);
-  //   });
+    it('should throw a NotFoundException if postId not exist', async () => {
+      try {
+        await postService.updatePost(0, requestDto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual('Post ID 0 not found.');
+      }
+    });
+  });
 
-  //   it('should throw a NotFoundException', async () => {
-  //     try {
-  //       await service.getPostByUserId(999);
-  //     } catch (e) {
-  //       expect(e).toBeInstanceOf(NotFoundException);
-  //       expect(e.message).toEqual('User ID 999 not found.');
-  //     }
-  //   });
-  // });
+  describe('deletePost', () => {
+    it('should delete a post', async () => {
+      const posts = await postService.getAllPosts();
+      const beforeDelete = (await postService.getAllPosts()).length;
+      await postService.deletePost(posts[0].id);
+      const afterDelete = (await postService.getAllPosts()).length;
+
+      expect(beforeDelete - afterDelete).toEqual(1);
+
+      try {
+        await postService.deletePost(posts[0].id);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual(`Post ID ${posts[0].id} not found.`);
+      }
+    });
+
+    it('should throw a NotFoundException if postId not exist', async () => {
+      try {
+        await postService.deletePost(0);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual('Post ID 0 not found.');
+      }
+    });
+  });
+
+  describe('getUserByPostId', () => {
+    it('should return a post with user', async () => {
+      const users = await userService.getAllUsers();
+      const requestDto: CreatePostDto = {
+        title: 'title 02',
+        content: 'content 02',
+        published: true,
+        authorId: users[0].id,
+      };
+
+      await postService.createPost(requestDto);
+
+      const posts = await postService.getAllPosts();
+      const result = await postService.getUserByPostId(posts[0].id);
+
+      const tempData = {
+        id: posts[0].id,
+        title: 'title 02',
+        content: 'content 02',
+        published: true,
+        authorId: users[0].id,
+        author: users[0],
+      };
+
+      expect(result).toEqual(tempData);
+    });
+
+    it('should throw a NotFoundException if postId not exist', async () => {
+      try {
+        await postService.getUserByPostId(0);
+      } catch (e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+        expect(e.message).toEqual('Post ID 0 not found.');
+      }
+    });
+  });
+
+  describe('getUserNameByPostId', () => {
+    it('should return a post with user name', async () => {
+      const users = await userService.getAllUsers();
+      const posts = await postService.getAllPosts();
+      const result = await postService.getUserNameByPostId(posts[0].id);
+
+      const tempData = {
+        id: posts[0].id,
+        title: 'title 02',
+        content: 'content 02',
+        published: true,
+        authorId: users[0].id,
+        author: { name: users[0].name },
+      };
+
+      expect(result).toEqual(tempData);
+    });
+  });
+
+  it('should throw a NotFoundException if postId not exist', async () => {
+    try {
+      await postService.getUserNameByPostId(0);
+    } catch (e) {
+      expect(e).toBeInstanceOf(NotFoundException);
+      expect(e.message).toEqual('Post ID 0 not found.');
+    }
+  });
 });

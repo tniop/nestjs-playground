@@ -10,7 +10,7 @@ import {
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreatePostDto } from 'src/posts/dto/create-post.dto';
+import { CreatePostUserDto } from 'src/posts/dto/create-post-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -53,7 +53,7 @@ export class UserController {
 
   @Post('posts')
   createUserAndPosts(
-    @Body() data: [userData: CreateUserDto, postDatas: CreatePostDto[]],
+    @Body() data: [userData: CreateUserDto, postDatas: CreatePostUserDto[]],
   ) {
     const [userData, postDatas] = data;
     return this.userService.createUserAndPosts(userData, postDatas);
