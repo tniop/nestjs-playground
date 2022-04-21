@@ -4,6 +4,28 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { PrismaClient } from '@prisma/client';
 
+const testUser1 = {
+  email: 'test1@test.com',
+  name: 'user1',
+};
+
+const testUser2 = {
+  email: 'test2@test.com',
+  name: 'user2',
+};
+
+const testPost1 = {
+  title: 'title 01',
+  content: 'content 01',
+  published: true,
+};
+
+const testPost2 = {
+  title: 'title 02',
+  content: 'content 02',
+  published: false,
+};
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   const prisma = new PrismaClient({
@@ -24,132 +46,100 @@ describe('AppController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
       new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
+        // whitelist: true,
+        // forbidNonWhitelisted: true,
         transform: true,
       }),
     );
     await app.init();
   });
 
-  describe('/users', () => {
-    it('GET 200', async () => {
-      return await request(app.getHttpServer()).get('/users').expect(200);
-    });
+  afterAll(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.post.deleteMany({});
+  });
 
-    it('POST 201', async () => {
+  describe('##### USER #####', () => {
+    it('Create user', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/users')
+        .send(testUser1);
+
+      expect(res.status).toBe(201);
+      expect(res.body).toStrictEqual({
+        id: expect.any(Number),
+        email: 'test1@test.com',
+        name: 'user1',
+      });
+
       return await request(app.getHttpServer())
         .post('/users')
-        .send({
-          id: 1,
-          email: 'e2eTest1@test.com', // db 확인
-          name: 'e2eTest',
-        })
+        .send(testUser2)
         .expect(201);
     });
 
-    it('POST 400', async () => {
-      return await request(app.getHttpServer())
-        .post('/users')
+    it('Get all users', async () => {
+      const res = await request(app.getHttpServer()).get('/users');
+      const { body } = res;
+
+      expect(body).toStrictEqual([
+        {
+          id: expect.any(Number),
+          email: 'test1@test.com',
+          name: 'user1',
+        },
+        {
+          id: expect.any(Number),
+          email: 'test2@test.com',
+          name: 'user2',
+        },
+      ]);
+    });
+
+    it('Update user', async () => {
+      const users = await request(app.getHttpServer()).get('/users');
+      const res = await request(app.getHttpServer())
+        .patch(`/users/${users.body[0].id}`)
         .send({
-          id: 1,
-          email: 'e2eTest1@test.com',
-          name: 123,
-        })
-        .expect(400);
-    });
-
-    it('DELETE 200', async () => {
-      // db 확인
-      await request(app.getHttpServer()).post('/users').send({
-        id: 2,
-        email: 'e2eTest2@test.com',
-        name: 'e2eTest',
+          email: 'update@test.com',
+          name: 'updateUser',
+        });
+      expect(res.status).toBe(200);
+      expect(res.body).toStrictEqual({
+        id: expect.any(Number),
+        email: 'update@test.com',
+        name: 'updateUser',
       });
-
-      const tempArr = await prisma.user.findMany();
-      const size = tempArr.length;
-      const tempId = tempArr[size - 1].id;
-      return request(app.getHttpServer())
-        .delete(`/users/${tempId}`)
-        .expect(200);
     });
 
-    it('GET 200', async () => {
-      const tempArr = await prisma.user.findMany();
-      console.log(tempArr);
-      console.log(tempArr[0]);
-      const tempId = tempArr[0].id;
-      return request(app.getHttpServer()).get(`/users/${tempId}`).expect(200);
+    it('Delete user', async () => {
+      const users = await request(app.getHttpServer()).get('/users');
+      const res = await request(app.getHttpServer()).delete(
+        `/users/${users.body[0].id}`,
+      );
+      expect(res.status).toBe(200);
+
+      const afterDeleteUsers = await request(app.getHttpServer()).get('/users');
+      expect(users.body.length - afterDeleteUsers.body.length).toBe(1);
+
+      await request(app.getHttpServer()).delete(`/users/${users.body[0].id}`);
     });
 
-    it('GET 404', () => {
-      return request(app.getHttpServer()).get('/users/999').expect(404);
-    });
+    it('Create user with posts and Get them all', async () => {
+      const res1 = await request(app.getHttpServer())
+        .post('/users/posts')
+        .send([testUser1, [testPost1, testPost2]]);
+      expect(res1.status).toBe(201);
 
-    it('PATCH 200', async () => {
-      const tempArr = await prisma.user.findMany();
-      const tempId = tempArr[0].id;
-      return request(app.getHttpServer())
-        .patch(`/users/${tempId}`)
-        .send({ name: 'e2eUpdateTest' })
-        .expect(200);
+      const res2 = await request(app.getHttpServer()).get(
+        `/users/posts/${res1.body.id}`,
+      );
+      expect(res2.status).toBe(200);
+      expect(res1.body).toEqual(res2.body);
     });
   });
 
-  // describe('/posts', () => {
-  //   it('GET 200', async () => {
-  //     return await request(app.getHttpServer()).get('/posts').expect(200);
-  //   });
-
-  //   it('POST 201', async () => {
-  //     return await request(app.getHttpServer())
-  //       .post('/posts')
-  //       .send({
-  //         title: 'e2e_test_title',
-  //         content: 'e2e_test_content',
-  //         published: true,
-  //         authorId: 1,
-  //       })
-  //       .expect(201);
-  //   });
-
-  //   it('POST 400', async () => {
-  //     return await request(app.getHttpServer())
-  //       .post('/posts')
-  //       .send({
-  //         title: 'e2e_test_title',
-  //         content: 123,
-  //         published: true,
-  //         authorId: 1,
-  //       })
-  //       .expect(400);
-  //   });
-
-  //   it('DELETE 200', async () => {
-  //     await request(app.getHttpServer()).post('/posts').send({
-  //       title: 'e2e_test_title_2',
-  //       content: 'e2e_test_content_2',
-  //       published: true,
-  //       authorId: 1,
-  //     });
-  //     // db 확인
-  //     return request(app.getHttpServer()).delete('/posts/2').expect(200);
-  //   });
-
-  //   it('GET 200', () => {
-  //     return request(app.getHttpServer()).get('/posts/1').expect(200);
-  //   });
-
-  //   it('GET 404', () => {
-  //     return request(app.getHttpServer()).get('/posts/999').expect(404);
-  //   });
-
-  //   it('PATCH 200', () => {
-  //     return request(app.getHttpServer())
-  //       .patch('/posts/1')
-  //       .send({ title: 'e2e_update_test_title' })
-  //       .expect(200);
-  //   });
-  // });
+  describe('##### POST #####', () => {
+    it.todo('?');
+  });
 });
