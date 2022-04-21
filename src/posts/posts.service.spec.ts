@@ -1,13 +1,16 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
+import { UserService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostService } from './posts.service';
 
 describe('PostService', () => {
-  let service: PostService;
+  let userService: UserService;
+  let postService: PostService;
+
   const prisma = new PrismaClient({
     datasources: {
       db: {
@@ -21,10 +24,11 @@ describe('PostService', () => {
     await prisma.post.deleteMany({});
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PostService, PrismaService],
+      providers: [PostService, PrismaService, UserService],
     }).compile();
 
-    service = module.get<PostService>(PostService);
+    userService = module.get<UserService>(UserService);
+    postService = module.get<PostService>(PostService);
   });
 
   afterAll(async () => {
@@ -33,7 +37,7 @@ describe('PostService', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(postService).toBeDefined();
   });
 
   // describe('createPost', () => {
