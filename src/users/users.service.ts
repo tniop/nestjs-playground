@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { Users } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreatePostUserDto } from 'src/posts/dto/create-post-user.dto';
@@ -14,8 +14,8 @@ import { CreatePostUserDto } from 'src/posts/dto/create-post-user.dto';
 export class UserService {
   constructor(private readonly PrismaService: PrismaService) {}
 
-  async createUser(userData: CreateUserDto): Promise<User> {
-    const existUser = await this.PrismaService.user.findUnique({
+  async createUser(userData: CreateUserDto): Promise<Users> {
+    const existUser = await this.PrismaService.users.findUnique({
       where: { email: userData.email },
     });
 
@@ -23,15 +23,15 @@ export class UserService {
       throw new BadRequestException('already exist email.');
     }
 
-    return await this.PrismaService.user.create({ data: userData });
+    return await this.PrismaService.users.create({ data: userData });
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return await this.PrismaService.user.findMany();
+  async getAllUsers(): Promise<Users[]> {
+    return await this.PrismaService.users.findMany();
   }
 
-  async getUser(id: number): Promise<User> {
-    const user = await this.PrismaService.user.findUnique({
+  async getUser(id: number): Promise<Users> {
+    const user = await this.PrismaService.users.findUnique({
       where: { id: id },
     });
 
@@ -42,8 +42,8 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: number, userData: UpdateUserDto): Promise<User> {
-    const user = await this.PrismaService.user.findUnique({
+  async updateUser(id: number, userData: UpdateUserDto): Promise<Users> {
+    const user = await this.PrismaService.users.findUnique({
       where: { id: id },
     });
 
@@ -51,7 +51,7 @@ export class UserService {
       throw new NotFoundException(`User ID ${id} not found.`);
     }
 
-    return await this.PrismaService.user.update({
+    return await this.PrismaService.users.update({
       where: {
         id: id,
       },
@@ -59,8 +59,8 @@ export class UserService {
     });
   }
 
-  async deleteUser(id: number): Promise<User> {
-    const user = await this.PrismaService.user.findUnique({
+  async deleteUser(id: number): Promise<Users> {
+    const user = await this.PrismaService.users.findUnique({
       where: { id: id },
     });
 
@@ -68,15 +68,15 @@ export class UserService {
       throw new NotFoundException(`User ID ${id} not found.`);
     }
 
-    return await this.PrismaService.user.delete({
+    return await this.PrismaService.users.delete({
       where: {
         id: id,
       },
     });
   }
 
-  async getPostByUserId(userId: number): Promise<User> {
-    const user = await this.PrismaService.user.findUnique({
+  async getPostByUserId(userId: number): Promise<Users> {
+    const user = await this.PrismaService.users.findUnique({
       where: { id: userId },
       include: {
         posts: true,
@@ -90,8 +90,8 @@ export class UserService {
     return user;
   }
 
-  async getPostTitleByUserId(userId: number): Promise<User> {
-    const user = await this.PrismaService.user.findUnique({
+  async getPostTitleByUserId(userId: number): Promise<Users> {
+    const user = await this.PrismaService.users.findUnique({
       where: { id: userId },
       include: {
         posts: {
@@ -112,8 +112,8 @@ export class UserService {
   async createUserAndPosts(
     userData: CreateUserDto,
     postDatas: CreatePostUserDto[],
-  ): Promise<User> {
-    const existUser = await this.PrismaService.user.findUnique({
+  ): Promise<Users> {
+    const existUser = await this.PrismaService.users.findUnique({
       where: { email: userData.email },
     });
 
@@ -121,7 +121,7 @@ export class UserService {
       throw new BadRequestException('already exist email.');
     }
 
-    const userAndPost = await this.PrismaService.user.create({
+    const userAndPost = await this.PrismaService.users.create({
       data: {
         ...userData,
         posts: {

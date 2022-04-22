@@ -37,8 +37,8 @@ describe('AppController (e2e)', () => {
   });
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -55,8 +55,8 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
   });
 
   describe('##### USER #####', () => {
@@ -122,7 +122,7 @@ describe('AppController (e2e)', () => {
       const afterDeleteUsers = await request(app.getHttpServer()).get('/users');
       expect(users.body.length - afterDeleteUsers.body.length).toBe(1);
 
-      await request(app.getHttpServer()).delete(`/users/${users.body[0].id}`);
+      await request(app.getHttpServer()).delete(`/users/${users.body[1].id}`);
     });
 
     it('Create user with posts and Get them all', async () => {
@@ -140,6 +140,97 @@ describe('AppController (e2e)', () => {
   });
 
   describe('##### POST #####', () => {
-    it.todo('?');
+    it('Create post', async () => {
+      const user = await request(app.getHttpServer())
+        .post('/users')
+        .send(testUser2);
+      const res = await request(app.getHttpServer())
+        .post('/posts')
+        .send({ ...testPost1, author_id: user.body.id });
+
+      expect(res.status).toBe(201);
+      expect(res.body).toStrictEqual({
+        id: expect.any(Number),
+        title: 'title 01',
+        content: 'content 01',
+        published: true,
+        author_id: user.body.id,
+      });
+
+      return await request(app.getHttpServer())
+        .post('/posts')
+        .send({ ...testPost2, author_id: user.body.id })
+        .expect(201);
+    });
+
+    it('Get all posts', async () => {
+      const users = await request(app.getHttpServer()).get('/users');
+      const { body: usersBody } = users;
+      const res = await request(app.getHttpServer()).get('/posts');
+      const { body } = res;
+
+      expect([body[2], body[3]]).toStrictEqual([
+        {
+          id: expect.any(Number),
+          title: 'title 01',
+          content: 'content 01',
+          published: true,
+          author_id: usersBody[1].id,
+        },
+        {
+          id: expect.any(Number),
+          title: 'title 02',
+          content: 'content 02',
+          published: false,
+          author_id: usersBody[1].id,
+        },
+      ]);
+    });
+    it('Update post', async () => {
+      const posts = await request(app.getHttpServer()).get('/posts');
+      const res = await request(app.getHttpServer())
+        .patch(`/posts/${posts.body[0].id}`)
+        .send({
+          title: 'title update',
+          content: 'content update',
+          published: false,
+        });
+      expect(res.status).toBe(200);
+      expect(res.body).toStrictEqual({
+        id: expect.any(Number),
+        title: 'title update',
+        content: 'content update',
+        published: false,
+        author_id: posts.body[0].author_id,
+      });
+    });
+    it('Delete posts', async () => {
+      const posts = await request(app.getHttpServer()).get('/posts');
+      const res = await request(app.getHttpServer()).delete(
+        `/posts/${posts.body[0].id}`,
+      );
+      expect(res.status).toBe(200);
+
+      const afterDeletePosts = await request(app.getHttpServer()).get('/posts');
+      expect(posts.body.length - afterDeletePosts.body.length).toBe(1);
+    });
+    it('Get post with user', async () => {
+      const users = await request(app.getHttpServer()).get('/users');
+      const posts = await request(app.getHttpServer()).get('/posts');
+      const res = await request(app.getHttpServer()).get(
+        `/posts/user/${posts.body[0].id}`,
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.body).toStrictEqual({
+        id: posts.body[0].id,
+        ...testPost2,
+        author_id: users.body[0].id,
+        author: {
+          id: users.body[0].id,
+          ...testUser1,
+        },
+      });
+    });
   });
 });

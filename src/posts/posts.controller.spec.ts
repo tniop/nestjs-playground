@@ -22,8 +22,8 @@ describe('PostController Unit Test', () => {
   });
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PostController],
@@ -42,8 +42,8 @@ describe('PostController Unit Test', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
   });
 
   it('should be defined', () => {
@@ -69,7 +69,7 @@ describe('PostController Unit Test', () => {
       expect(result.title).toEqual(requestDto.title);
       expect(result.content).toEqual(requestDto.content);
       expect(result.published).toEqual(requestDto.published);
-      expect(result.authorId).toEqual(requestDto.authorId);
+      expect(result.author_id).toEqual(requestDto.authorId);
       expect(afterCreate - beforeCreate).toEqual(1);
     });
 
@@ -107,7 +107,7 @@ describe('PostController Unit Test', () => {
       expect(result.title).toEqual('title 01');
       expect(result.content).toEqual('content 01');
       expect(result.published).toEqual(true);
-      expect(result.authorId).toEqual(users[0].id);
+      expect(result.author_id).toEqual(users[0].id);
     });
 
     it('should throw a NotFoundException if postId not exist', async () => {
@@ -194,7 +194,7 @@ describe('PostController Unit Test', () => {
         title: 'title 02',
         content: 'content 02',
         published: true,
-        authorId: users[0].id,
+        author_id: users[0].id,
         author: users[0],
       };
 

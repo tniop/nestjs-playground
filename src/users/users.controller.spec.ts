@@ -22,8 +22,8 @@ describe('UserController Unit Test', () => {
   });
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
@@ -35,8 +35,8 @@ describe('UserController Unit Test', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
   });
 
   it('should be defined', () => {

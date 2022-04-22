@@ -13,6 +13,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDtoSnakeToCamelCasePipe } from './pipe/CreatePostDtoSnakeToCamelCasePipe';
 import { UpdatePostDtoSnakeToCamelCasePipe } from './pipe/UpdatePostDtoSnakeToCamelCasePipe';
+import { toSnake } from 'snake-camel';
 
 @Controller('posts')
 export class PostController {
@@ -20,40 +21,40 @@ export class PostController {
 
   @Post()
   @UsePipes(new CreatePostDtoSnakeToCamelCasePipe())
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.createPost(createPostDto);
+  async create(@Body() createPostDto: CreatePostDto): Promise<any> {
+    return toSnake(await this.postService.createPost(createPostDto));
   }
 
   @Get()
-  findAll() {
-    return this.postService.getAllPosts();
+  async findAll(): Promise<any> {
+    return (await this.postService.getAllPosts()).map(toSnake);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.postService.getPost(id);
+  async findOne(@Param('id') id: number): Promise<any> {
+    return toSnake(await this.postService.getPost(id));
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: number,
     @Body(UpdatePostDtoSnakeToCamelCasePipe) updatePostDto: UpdatePostDto,
-  ) {
-    return this.postService.updatePost(id, updatePostDto);
+  ): Promise<any> {
+    return toSnake(await this.postService.updatePost(id, updatePostDto));
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.postService.deletePost(id);
+  async remove(@Param('id') id: number): Promise<any> {
+    return toSnake(await this.postService.deletePost(id));
   }
 
   @Get('user/:id')
-  getUserByPostId(@Param('id') postId: number) {
-    return this.postService.getUserByPostId(postId);
+  async getUserByPostId(@Param('id') postId: number): Promise<any> {
+    return toSnake(await this.postService.getUserByPostId(postId));
   }
 
   @Get('user/name/:id')
-  getUserNameByPostId(@Param('id') postId: number) {
-    return this.postService.getUserNameByPostId(postId);
+  async getUserNameByPostId(@Param('id') postId: number): Promise<any> {
+    return toSnake(this.postService.getUserNameByPostId(postId));
   }
 }

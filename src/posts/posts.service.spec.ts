@@ -21,8 +21,8 @@ describe('PostService Unit Test', () => {
   });
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [PostService, PrismaService, UserService],
@@ -40,8 +40,8 @@ describe('PostService Unit Test', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({});
-    await prisma.post.deleteMany({});
+    await prisma.users.deleteMany({});
+    await prisma.posts.deleteMany({});
   });
 
   it('should be defined', () => {

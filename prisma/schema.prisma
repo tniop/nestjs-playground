@@ -7,22 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id      Int       @id @default(autoincrement())
   email   String    @unique
   name    String?
-  posts   Post[]
+  posts   Posts[]
 
   @@map("users")
 }
 
-model Post {
+model Posts {
   id        Int       @id @default(autoincrement())
   title     String
   content   String?
   published Boolean?  @default(false)
   authorId  Int       @map("author_id")
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    Users      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@map("posts")
 }
