@@ -68,9 +68,12 @@ describe('AppController (e2e)', () => {
       expect(res.status).toBe(201);
       expect(res.body).toStrictEqual({
         id: expect.any(Number),
-        email: 'test1@test.com',
-        name: 'user1',
+        ...testUser1,
       });
+
+      expect(
+        (await request(app.getHttpServer()).get('/users')).body,
+      ).toStrictEqual([res.body]);
 
       return await request(app.getHttpServer())
         .post('/users')
@@ -85,13 +88,11 @@ describe('AppController (e2e)', () => {
       expect(body).toStrictEqual([
         {
           id: expect.any(Number),
-          email: 'test1@test.com',
-          name: 'user1',
+          ...testUser1,
         },
         {
           id: expect.any(Number),
-          email: 'test2@test.com',
-          name: 'user2',
+          ...testUser2,
         },
       ]);
     });
@@ -122,6 +123,14 @@ describe('AppController (e2e)', () => {
       const afterDeleteUsers = await request(app.getHttpServer()).get('/users');
       expect(users.body.length - afterDeleteUsers.body.length).toBe(1);
 
+      const deleteCheck = await request(app.getHttpServer()).get(
+        `/users/${users.body[0].id}`,
+      );
+
+      expect(deleteCheck.body.message).toEqual(
+        `User ID ${users.body[0].id} not found.`,
+      );
+
       await request(app.getHttpServer()).delete(`/users/${users.body[1].id}`);
     });
 
@@ -151,9 +160,7 @@ describe('AppController (e2e)', () => {
       expect(res.status).toBe(201);
       expect(res.body).toStrictEqual({
         id: expect.any(Number),
-        title: 'title 01',
-        content: 'content 01',
-        published: true,
+        ...testPost1,
         author_id: user.body.id,
       });
 
@@ -172,20 +179,17 @@ describe('AppController (e2e)', () => {
       expect([body[2], body[3]]).toStrictEqual([
         {
           id: expect.any(Number),
-          title: 'title 01',
-          content: 'content 01',
-          published: true,
+          ...testPost1,
           author_id: usersBody[1].id,
         },
         {
           id: expect.any(Number),
-          title: 'title 02',
-          content: 'content 02',
-          published: false,
+          ...testPost2,
           author_id: usersBody[1].id,
         },
       ]);
     });
+
     it('Update post', async () => {
       const posts = await request(app.getHttpServer()).get('/posts');
       const res = await request(app.getHttpServer())
@@ -204,6 +208,7 @@ describe('AppController (e2e)', () => {
         author_id: posts.body[0].author_id,
       });
     });
+
     it('Delete posts', async () => {
       const posts = await request(app.getHttpServer()).get('/posts');
       const res = await request(app.getHttpServer()).delete(
@@ -213,7 +218,16 @@ describe('AppController (e2e)', () => {
 
       const afterDeletePosts = await request(app.getHttpServer()).get('/posts');
       expect(posts.body.length - afterDeletePosts.body.length).toBe(1);
+
+      const deleteCheck = await request(app.getHttpServer()).get(
+        `/posts/${posts.body[0].id}`,
+      );
+
+      expect(deleteCheck.body.message).toEqual(
+        `Post ID ${posts.body[0].id} not found.`,
+      );
     });
+
     it('Get post with user', async () => {
       const users = await request(app.getHttpServer()).get('/users');
       const posts = await request(app.getHttpServer()).get('/posts');
