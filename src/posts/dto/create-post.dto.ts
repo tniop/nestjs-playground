@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
@@ -12,7 +13,7 @@ export class CreatePostDto {
   @IsBoolean()
   published: boolean;
 
-  @IsOptional()
   @IsNumber()
+  @Expose({ name: 'author_id' })
   authorId: number;
 }
