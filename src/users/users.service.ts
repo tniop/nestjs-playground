@@ -1,26 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Users } from '@prisma/client';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly PrismaService: PrismaService) {}
+  async create(userData: CreateUserDto): Promise<Users> {
+    const existUser = await this.PrismaService.users.findUnique({
+      where: { email: userData.email },
+    });
+
+    if (existUser) {
+      throw new BadRequestException('already exist email.');
+    }
+
+    const user = await this.PrismaService.users.create({ data: userData });
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<Users[]> {
+    return await this.PrismaService.users.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findOne(email: string): Promise<Users> {
+    return await this.PrismaService.users.findUnique({
+      where: { email: email },
+    });
   }
 }
