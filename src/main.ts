@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
+import { setupSwagger } from 'src/util/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,6 +20,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  setupSwagger(app);
   await app.listen(3000);
 }
 bootstrap();
