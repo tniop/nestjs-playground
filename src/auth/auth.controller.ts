@@ -16,6 +16,5 @@ export class AuthController {
   @Get('/google/redirect')
   async signInWithGoogleRedirect(@Req() req) {
     return this.authService.signInWithGoogle(req);
-    // return this.authService.login(req.user);
   }
 }
