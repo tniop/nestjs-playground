@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, Matches, MaxLength } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -7,10 +7,12 @@ export class CreateUserDto {
   readonly givenName: string;
 
   @IsString()
+  @MaxLength(60)
   @ApiProperty({ description: '성' })
   readonly familyName: string;
 
   @IsEmail()
+  @Matches(/^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)
   @ApiProperty({ description: 'email' })
   readonly email: string;
 

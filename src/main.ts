@@ -5,6 +5,9 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
 import { setupSwagger } from 'src/util/swagger';
+import { logger } from './middleware/logger.middleware';
+import { LoggingInterceptor } from './interceptor/logging.interceptor';
+import { TransformInterceptor } from './interceptor/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -21,6 +24,11 @@ async function bootstrap() {
     }),
   );
   setupSwagger(app);
+  app.use(logger); // global middleware
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TransformInterceptor(),
+  ); // global interceotor
   await app.listen(3000);
 }
 bootstrap();
