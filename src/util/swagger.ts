@@ -14,5 +14,5 @@ export function setupSwagger(app: INestApplication): void {
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('swagger', app, document);
+  SwaggerModule.setup('swagger', app, document); // 첫번째 pram : uri
 }
