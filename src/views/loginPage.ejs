@@ -9,32 +9,39 @@
     ></script>
     <!-- <script src="../../src/public/js/login.js"></script> -->
     <script>
+      $(document).ready(() => {
+        console.log('start');
+      });
+
       function login() {
         console.log('enter');
         const adminNickname = $('#inputEmail').val();
         const password = $('#inputPassword').val();
 
-        $.ajax({
-          type: 'POST',
-          url: `/api/login`,
-          data: {
-            adminNickname,
-            password,
-          },
-          success: (res) => {
-            sessionStorage.setItem('token', res.token);
-            location.href = '/';
-          },
-          error: (err) => {
-            alert(err.responseJSON.errorMessage);
-            document.querySelector('#inputPassword').value = '';
-          },
-        });
+        window.location = 'http://localhost:3000/auth/google';
+        // $.ajax({
+        //   type: 'GET',
+        //   url: `/auth/google`,
+        //   data: {
+        //     // adminNickname,
+        //     // password,
+        //   },
+        //   success: (res) => {
+        //     // sessionStorage.setItem('token', res.token);
+            
+        //     console.log(res);
+        //   },
+        //   error: (err) => {
+        //     console.log(err);
+        //     // alert(err.responseJSON.errorMessage);
+        //     // document.querySelector('#inputPassword').value = '';
+        //   },
+        // });
+
+        console.log(adminNickname);
       }
 
-      function register() {
-        
-      }
+      function register() {}
     </script>
   </head>
   <body class="bg-primary">
@@ -68,25 +75,12 @@
                         />
                         <label for="inputPassword">Password</label>
                       </div>
-                      <div class="form-check mb-3">
-                        <input
-                          class="form-check-input"
-                          id="inputRememberPassword"
-                          type="checkbox"
-                          value=""
-                        />
-                        <label
-                          class="form-check-label"
-                          for="inputRememberPassword"
-                          >Remember Password</label
-                        >
-                      </div>
-                      <div
-                        class="d-flex align-items-center justify-content-between mt-4 mb-0"
-                      >
-                        <a class="btn btn-primary" onclick="login()">Login</a>
-                      </div>
                     </form>
+                  </div>
+                  <div class="card-footer text-center py-3">
+                    <div class="small">
+                      <a onclick="login()">Login</a>
+                    </div>
                   </div>
                   <div class="card-footer text-center py-3">
                     <div class="small">
