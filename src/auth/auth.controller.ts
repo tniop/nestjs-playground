@@ -13,7 +13,9 @@ export class AuthController {
   @ApiOperation({ summary: 'google OAuth', description: 'google OAuth 인증' })
   @ApiCreatedResponse({ description: 'google login' })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async signInWithGoogle(@Req() req) {}
+  async signInWithGoogle(@Req() req) {
+    console.log("test")
+  }
 
   @UseGuards(AuthGuard('google'))
   @Get('/google/redirect')

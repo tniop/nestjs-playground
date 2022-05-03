@@ -2,9 +2,15 @@ import { Controller, Get, Render } from '@nestjs/common';
 
 @Controller()
 export class ViewController {
-  @Get()
+  @Get('/login')
   @Render('loginPage')
-  async view() {
+  async getLoginPage() {
+    return {};
+  }
+
+  @Get()
+  @Render('main')
+  async getMain() {
     return {};
   }
 }

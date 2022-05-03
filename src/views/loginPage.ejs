@@ -2,97 +2,38 @@
 <html lang="en">
   <head>
     <%- include ('common') %>
-    <title>Login</title>
-    <script
-      src="https://use.fontawesome.com/releases/v6.1.0/js/all.js"
-      crossorigin="anonymous"
-    ></script>
-    <!-- <script src="../../src/public/js/login.js"></script> -->
-    <script>
-      $(document).ready(() => {
-        console.log('start');
-      });
 
-      function login() {
-        console.log('enter');
-        const adminNickname = $('#inputEmail').val();
-        const password = $('#inputPassword').val();
-
-        window.location = 'http://localhost:3000/auth/google';
-        // $.ajax({
-        //   type: 'GET',
-        //   url: `/auth/google`,
-        //   data: {
-        //     // adminNickname,
-        //     // password,
-        //   },
-        //   success: (res) => {
-        //     // sessionStorage.setItem('token', res.token);
-            
-        //     console.log(res);
-        //   },
-        //   error: (err) => {
-        //     console.log(err);
-        //     // alert(err.responseJSON.errorMessage);
-        //     // document.querySelector('#inputPassword').value = '';
-        //   },
-        // });
-
-        console.log(adminNickname);
-      }
-
-      function register() {}
-    </script>
+    <meta
+      name="google-signin-client_id"
+      content="++"
+    />
   </head>
-  <body class="bg-primary">
-    <div id="layoutAuthentication">
-      <div id="layoutAuthentication_content">
-        <main>
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-lg-5">
-                <div class="card shadow-lg border-0 rounded-lg mt-5">
-                  <div class="card-header">
-                    <h3 class="text-center font-weight-light my-4">Login</h3>
-                  </div>
-                  <div class="card-body">
-                    <form>
-                      <div class="form-floating mb-3">
-                        <input
-                          class="form-control"
-                          id="inputEmail"
-                          type="email"
-                          placeholder="name@example.com"
-                        />
-                        <label for="inputEmail">Email address</label>
-                      </div>
-                      <div class="form-floating mb-3">
-                        <input
-                          class="form-control"
-                          id="inputPassword"
-                          type="password"
-                          placeholder="Password"
-                        />
-                        <label for="inputPassword">Password</label>
-                      </div>
-                    </form>
-                  </div>
-                  <div class="card-footer text-center py-3">
-                    <div class="small">
-                      <a onclick="login()">Login</a>
-                    </div>
-                  </div>
-                  <div class="card-footer text-center py-3">
-                    <div class="small">
-                      <a onclick="register()">Sign up</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
+  <body>
+    <div id="my-signin2"></div>
+    <script>
+      function onSuccess(googleUser) {
+        console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+      }
+      function onFailure(error) {
+        console.log(error);
+      }
+      function renderButton() {
+        gapi.signin2.render('my-signin2', {
+          scope: 'profile email',
+          width: 240,
+          height: 50,
+          longtitle: true,
+          theme: 'dark',
+          onsuccess: onSuccess,
+          onfailure: onFailure,
+        });
+      }
+    </script>
+
+    <script
+      src="https://apis.google.com/js/platform.js?onload=renderButton"
+      async
+      defer
+    ></script>
   </body>
 </html>
