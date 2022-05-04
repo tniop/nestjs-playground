@@ -28,12 +28,10 @@ import { UsersController } from 'src/users/users.controller';
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // consumer.apply(LoggerMiddleware).forRoutes('auth');
-
     // consumer
     //   .apply(LoggerMiddleware)
     //   .exclude({ path: 'users', method: RequestMethod.POST }, 'auth/(.*)')
     //   .forRoutes(UsersController);
-
     // consumer.apply(logger).forRoutes(UsersController);
   }
 }

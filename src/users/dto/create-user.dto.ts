@@ -17,6 +17,10 @@ export class CreateUserDto {
   readonly email: string;
 
   @IsString()
+  @ApiProperty({ description: ' sub' })
+  readonly subId: string;
+
+  @IsString()
   @ApiProperty({ description: '사진 url' })
   readonly photo: string;
 

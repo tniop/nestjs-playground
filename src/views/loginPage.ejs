@@ -2,21 +2,36 @@
 <html lang="en">
   <head>
     <%- include ('common') %>
+    <title>Login</title>
 
     <meta
       name="google-signin-client_id"
-      content="++"
+      content="727183764673-adrqnjvlosaistplqq6l5r50bq6tj5pc.apps.googleusercontent.com"
     />
-  </head>
-  <body>
-    <div id="my-signin2"></div>
     <script>
       function onSuccess(googleUser) {
         console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+
+        console.log(googleUser);
+        // $.ajax({
+        //   type: 'POST',
+        //   url: `/users`,
+        //   data: {
+        //     googleUser,
+        //   },
+        //   success: (res) => {
+        //     alert('success create');
+        //   },
+        //   error: (err) => {
+        //     alert(err.responseJSON.errorMessage);
+        //   },
+        // });
       }
+
       function onFailure(error) {
         console.log(error);
       }
+
       function renderButton() {
         gapi.signin2.render('my-signin2', {
           scope: 'profile email',
@@ -28,6 +43,13 @@
           onfailure: onFailure,
         });
       }
+
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log('User signed out.');
+        });
+      }
     </script>
 
     <script
@@ -35,5 +57,9 @@
       async
       defer
     ></script>
+  </head>
+  <body>
+    <div id="my-signin2"></div>
+    <a href="#" onclick="signOut()">Sign out</a>
   </body>
 </html>

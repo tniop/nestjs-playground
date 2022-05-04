@@ -14,7 +14,7 @@ export class AuthController {
   @ApiCreatedResponse({ description: 'google login' })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async signInWithGoogle(@Req() req) {
-    console.log("test")
+    console.log('test');
   }
 
   @UseGuards(AuthGuard('google'))

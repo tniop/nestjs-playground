@@ -44,16 +44,14 @@ export class AuthService {
     if (!req.user) throw new BadRequestException();
 
     const existUser = await this.usersService.findOne(req.user.email);
-    if (existUser)
-      throw new ForbiddenException(
-        "User already exists, but Google account was not connected to user's account",
-      );
+    if (existUser) throw new ForbiddenException('User already exists');
 
     try {
       const newUser: CreateUserDto = {
         givenName: req.user.firstName,
         familyName: req.user.lastName,
         email: req.user.email,
+        subId: req.user.subId,
         photo: req.user.photos[0].value,
         accessToken: req.user.accessToken,
       };

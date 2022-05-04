@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <%- include ('common') %>
     <title>Main</title>
     <script>
       $(document).ready(() => {
         console.log('enter main page.');
       });
+
+      function logout() {
+        // storage clear
+        // location.href = '/login';
+      }
     </script>
   </head>
-  <body>
-    pass
-  </body>
+  <body></body>
 </html>
