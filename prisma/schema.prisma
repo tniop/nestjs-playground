@@ -21,3 +21,14 @@ model Users {
   
   @@map("users")
 }
+
+model UserTokens {
+  id    Int     @id @default(autoincrement())
+  name  String
+  email String  @unique
+  subId String @unique @map("sub_id")
+  accessToken String @unique @map("access_token")
+  photo String
+  
+  @@map("user_tokens")
+}

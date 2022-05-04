@@ -13,19 +13,23 @@
         console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
 
         console.log(googleUser);
-        // $.ajax({
-        //   type: 'POST',
-        //   url: `/users`,
-        //   data: {
-        //     googleUser,
-        //   },
-        //   success: (res) => {
-        //     alert('success create');
-        //   },
-        //   error: (err) => {
-        //     alert(err.responseJSON.errorMessage);
-        //   },
-        // });
+        console.log(googleUser.getAuthResponse().id_token);
+        token = googleUser.getAuthResponse().id_token;
+        $.ajax({
+          type: 'POST',
+          url: `/token`,
+          data: {
+            token,
+          },
+          success: (res) => {
+            console.log(res.data.email);
+            if (res.data.email === 'exist') alert('already create user. hi');
+            else alert('create user');
+          },
+          error: (err) => {
+            alert(err.responseJSON.errorMessage);
+          },
+        });
       }
 
       function onFailure(error) {
