@@ -22,9 +22,11 @@
             token,
           },
           success: (res) => {
-            console.log(res.data.email);
-            if (res.data.email === 'exist') alert('already create user. hi');
-            else alert('create user');
+            console.log(res);
+            console.log(res.data.userTokens.email);
+            console.log(res.data.exist);
+            if (res.data.exist) alert('already exist user. update it!');
+            else alert('create user!');
           },
           error: (err) => {
             alert(err.responseJSON.errorMessage);

@@ -9,7 +9,9 @@ import { UpdateTokenDto } from './dto/update-token.dto';
 export class TokenService {
   constructor(private readonly PrismaService: PrismaService) {}
 
-  async create(createTokenDto: CreateTokenDto): Promise<UserTokens> {
+  async create(
+    createTokenDto: CreateTokenDto,
+  ): Promise<{ userTokens: UserTokens; exist: boolean }> {
     console.log(createTokenDto);
 
     try {
@@ -30,20 +32,28 @@ export class TokenService {
       });
 
       if (existToken) {
-        existToken.email = 'exist';
-        return existToken;
+        const updateToken = await this.PrismaService.userTokens.update({
+          where: {
+            email: payload.email,
+          },
+          data: {
+            name: payload.name,
+            idToken: createTokenDto.token,
+            photo: payload.picture,
+          },
+        });
+        return { userTokens: updateToken, exist: true };
+      } else {
+        const user = await this.PrismaService.userTokens.create({
+          data: {
+            name: payload.name,
+            email: payload.email,
+            idToken: createTokenDto.token,
+            photo: payload.picture,
+          },
+        });
+        return { userTokens: user, exist: false };
       }
-
-      const user = await this.PrismaService.userTokens.create({
-        data: {
-          name: payload.name,
-          email: payload.email,
-          subId: payload.sub,
-          accessToken: payload.aud,
-          photo: payload.picture,
-        },
-      });
-      return user;
     } catch (e) {
       throw new Error(e);
     }

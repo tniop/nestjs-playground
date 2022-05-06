@@ -23,7 +23,9 @@ export class TokenController {
     description: 'token으로 유저를 생성한다.',
   })
   @ApiCreatedResponse({ description: 'token으로 유저를 생성한다.' })
-  async create(@Body() createTokenDto: CreateTokenDto): Promise<UserTokens> {
+  async create(
+    @Body() createTokenDto: CreateTokenDto,
+  ): Promise<{ userTokens: UserTokens; exist: boolean }> {
     return await this.tokenService.create(createTokenDto);
   }
 
