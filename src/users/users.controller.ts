@@ -11,12 +11,18 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Users } from '@prisma/client';
-import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ForbiddenException } from 'src/filter/forbidden.exception';
 import { HttpExceptionFilter } from 'src/filter/http-exception.filter';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 
 // @UseInterceptors(LoggingInterceptor)
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -29,6 +35,7 @@ export class UsersController {
   }
 
   @Get()
+  @ApiBearerAuth('token')
   @UseInterceptors(LoggingInterceptor)
   @ApiOperation({
     summary: '유저 조회 API',

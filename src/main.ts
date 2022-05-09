@@ -8,6 +8,7 @@ import { setupSwagger } from 'src/util/swagger';
 import { logger } from './middleware/logger.middleware';
 import { LoggingInterceptor } from './interceptor/logging.interceptor';
 import { TransformInterceptor } from './interceptor/transform.interceptor';
+import * as basicAuth from 'express-basic-auth';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -21,6 +22,15 @@ async function bootstrap() {
       // whitelist: true,
       // forbidNonWhitelisted: true,
       transform: true,
+    }),
+  );
+  app.use(
+    ['/docs'],
+    basicAuth({
+      challenge: true,
+      users: {
+        [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD,
+      },
     }),
   );
   setupSwagger(app);

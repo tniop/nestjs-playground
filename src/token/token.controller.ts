@@ -10,9 +10,10 @@ import {
 import { TokenService } from './token.service';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
-import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserTokens } from '@prisma/client';
 
+@ApiTags('Token')
 @Controller('token')
 export class TokenController {
   constructor(private readonly tokenService: TokenService) {}

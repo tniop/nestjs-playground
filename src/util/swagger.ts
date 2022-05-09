@@ -11,8 +11,22 @@ export function setupSwagger(app: INestApplication): void {
     .setTitle('Google OAuth Sample API Docs')
     .setDescription('Google OAuth Sample API description')
     .setVersion('1.0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('swagger', app, document); // 첫번째 pram : uri
+  SwaggerModule.setup('docs', app, document, {
+    // swaggerOptions: {
+    //   supportedSubmitMethods: [],
+    // },
+  }); // 첫번째 pram : uri
 }
