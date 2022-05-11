@@ -18,7 +18,6 @@ export class AuthService {
     // 프로젝트에서는 accessToken 암호화
     const user = await this.usersService.findOne(email);
     if (user && user.accessToken === accessToken) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { accessToken, ...result } = user; // exclude accessToken
       return result;
     }

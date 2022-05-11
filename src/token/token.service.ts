@@ -1,9 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserTokens } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTokenDto } from './dto/create-token.dto';
-import { UpdateTokenDto } from './dto/update-token.dto';
 
 @Injectable()
 export class TokenService {

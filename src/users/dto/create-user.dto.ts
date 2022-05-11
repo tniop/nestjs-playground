@@ -25,6 +25,6 @@ export class CreateUserDto {
   readonly photo: string;
 
   @IsString()
-  @ApiProperty({ description: 'google OAuth Authorization Code' })
+  @ApiProperty({ description: 'google OAuth Authorization' })
   readonly accessToken: string;
 }

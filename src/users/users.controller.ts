@@ -17,9 +17,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ForbiddenException } from 'src/filter/forbidden.exception';
-import { HttpExceptionFilter } from 'src/filter/http-exception.filter';
-import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
+import { ForbiddenException } from '../filter/forbidden.exception';
+import { HttpExceptionFilter } from '../filter/http-exception.filter';
+import { LoggingInterceptor } from '../interceptor/logging.interceptor';
 
 // @UseInterceptors(LoggingInterceptor)
 @ApiTags('User')
@@ -46,7 +46,7 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get('test')
+  @Get('test') // filter test api
   // @UseFilters(new HttpExceptionFilter())
   async testExceptionFilter() {
     // throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
