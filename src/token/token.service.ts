@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserTokens } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
@@ -60,5 +60,33 @@ export class TokenService {
 
   async findAll(): Promise<UserTokens[]> {
     return await this.PrismaService.userTokens.findMany();
+  }
+
+  async findOne(email: string): Promise<UserTokens> {
+    const user = await this.PrismaService.userTokens.findUnique({
+      where: { email: email },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`${email} is not found.`);
+    }
+
+    return user;
+  }
+
+  async deleteUser(email: string): Promise<UserTokens> {
+    const user = await this.PrismaService.userTokens.findUnique({
+      where: { email: email },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`${email} is not found.`);
+    }
+
+    return await this.PrismaService.userTokens.delete({
+      where: {
+        email: email,
+      },
+    });
   }
 }

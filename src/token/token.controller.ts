@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -29,5 +29,25 @@ export class TokenController {
   @ApiCreatedResponse({ description: '유저 목록을 가져온다.' })
   async findAll(): Promise<UserTokens[]> {
     return await this.tokenService.findAll();
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: '유저 조회 API',
+    description: '유저를 가져온다.',
+  })
+  @ApiCreatedResponse({ description: '유저를 가져온다.' })
+  async findOne(@Body() email: string): Promise<UserTokens> {
+    return await this.tokenService.findOne(email);
+  }
+
+  @Delete()
+  @ApiOperation({
+    summary: '유저 삭제 API',
+    description: '유저를 삭제한다.',
+  })
+  @ApiCreatedResponse({ description: '유저를 삭제한다.' })
+  remove(@Body() email: string) {
+    return this.tokenService.deleteUser(email);
   }
 }
