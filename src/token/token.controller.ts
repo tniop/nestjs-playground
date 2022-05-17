@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Delete } from '@nestjs/common';
 import { TokenService } from './token.service';
-import { CreateTokenDto } from './dto/create-token.dto';
+import { CreateTokenRequestDto } from './dto/create-token-request.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserTokens } from '@prisma/client';
 
@@ -15,10 +15,12 @@ export class TokenController {
     description: 'token으로 유저를 생성한다.',
   })
   @ApiCreatedResponse({ description: 'token으로 유저를 생성한다.' })
-  async create(
-    @Body() createTokenDto: CreateTokenDto,
+  async login(
+    @Body() CreateTokenRequestDto: CreateTokenRequestDto,
   ): Promise<{ userTokens: UserTokens; exist: boolean }> {
-    return await this.tokenService.create(createTokenDto);
+    return await this.tokenService.login(
+      await this.tokenService.validate(CreateTokenRequestDto),
+    );
   }
 
   @Get()

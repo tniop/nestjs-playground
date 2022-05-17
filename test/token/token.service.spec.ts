@@ -1,17 +1,18 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateTokenDto } from './dto/create-token.dto';
-import { TokenService } from './token.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
+import { CreateTokenUserDto } from '../../src/token/dto/create-token-user.dto';
+import { TokenService } from '../../src/token/token.service';
 
-const token: CreateTokenDto = {
-  token: process.env.TEST_TOKEN,
+const userInfo: CreateTokenUserDto = {
+  email: 'service_test@test.com',
+  name: 'service_test',
+  idToken: 'service_test_token',
+  photo: 'service_test_photo_url',
 };
 
-const invalidToken: CreateTokenDto = {
-  token: 'invalid_token',
-};
+const validateSuccess = jest.fn().mockResolvedValue(userInfo);
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -42,27 +43,33 @@ describe('TokenService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a user', async () => {
-      const result = await service.create(token);
-      const users = await service.findOne(process.env.TEST_EMAIL);
+  describe('login', () => {
+    it('should create a user if user email not exist', async () => {
+      const result = await service.login(await validateSuccess());
+      const users = await service.findOne(userInfo.email);
 
       expect(result.userTokens.id).toEqual(users.id);
-      expect(result.userTokens.email).toEqual(process.env.TEST_EMAIL);
-      expect(result.userTokens.name).toEqual(process.env.TEST_NAME);
+      expect(result.userTokens.name).toEqual(userInfo.name);
+      expect(result.userTokens.email).toEqual(userInfo.email);
       expect(result.exist).toEqual(false);
     });
 
     it('should update if user email exists', async () => {
-      await service.create(token);
-      const result = await service.create(token);
+      const existUserInfo: CreateTokenUserDto = {
+        email: 'service_test@test.com',
+        name: 'update_service_test',
+        idToken: 'update_service_test_token',
+        photo: 'update_service_test_photo_url',
+      };
+      await service.login(await validateSuccess());
+      const result = await service.login(existUserInfo);
 
       expect(result.exist).toEqual(true);
     });
 
     it('should fail if invalid id token', async () => {
       try {
-        await service.create(invalidToken);
+        await service.validate({ token: 'invalid_token' });
       } catch (e) {
         expect(e.message).toEqual(
           'Error: Wrong number of segments in token: invalid_token',
@@ -80,12 +87,12 @@ describe('TokenService', () => {
 
   describe('findOne', () => {
     it('should return a user', async () => {
-      await service.create(token);
-      const result = await service.findOne(process.env.TEST_EMAIL);
+      await service.login(await validateSuccess());
+      const result = await service.findOne(userInfo.email);
 
       expect(result.id).toBeDefined();
-      expect(result.email).toEqual(process.env.TEST_EMAIL);
-      expect(result.name).toEqual(process.env.TEST_NAME);
+      expect(result.email).toEqual(userInfo.email);
+      expect(result.name).toEqual(userInfo.name);
     });
 
     it('should throw a NotFoundException if user email not exist', async () => {
@@ -100,15 +107,15 @@ describe('TokenService', () => {
 
   describe('deleteUser', () => {
     it('should delete a user', async () => {
-      await service.create(token);
+      await service.login(await validateSuccess());
       const beforeDelete = (await service.findAll()).length;
-      await service.deleteUser(process.env.TEST_EMAIL);
+      await service.deleteUser(userInfo.email);
       const afterDelete = (await service.findAll()).length;
 
       expect(beforeDelete - afterDelete).toEqual(1);
 
       try {
-        await service.findOne(process.env.TEST_EMAIL);
+        await service.findOne(userInfo.email);
       } catch (e) {
         expect(e).toBeInstanceOf(NotFoundException);
       }

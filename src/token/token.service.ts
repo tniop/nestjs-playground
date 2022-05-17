@@ -2,17 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserTokens } from '@prisma/client';
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateTokenDto } from './dto/create-token.dto';
+import { CreateTokenRequestDto } from './dto/create-token-request.dto';
+import { CreateTokenUserDto } from './dto/create-token-user.dto';
 
 @Injectable()
 export class TokenService {
   constructor(private readonly PrismaService: PrismaService) {}
 
-  async create(
-    createTokenDto: CreateTokenDto,
-  ): Promise<{ userTokens: UserTokens; exist: boolean }> {
-    console.log(createTokenDto);
-
+  async validate(
+    createTokenDto: CreateTokenRequestDto,
+  ): Promise<CreateTokenUserDto> {
     try {
       const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -21,40 +20,47 @@ export class TokenService {
         audience: process.env.GOOGLE_CLIENT_ID,
       });
       const payload = ticket.getPayload();
-      const userid = payload['sub'];
-      console.log(ticket);
-      console.log(payload);
-      console.log(userid);
 
-      const existToken = await this.PrismaService.userTokens.findUnique({
-        where: { email: payload.email },
-      });
-
-      if (existToken) {
-        const updateToken = await this.PrismaService.userTokens.update({
-          where: {
-            email: payload.email,
-          },
-          data: {
-            name: payload.name,
-            idToken: createTokenDto.token,
-            photo: payload.picture,
-          },
-        });
-        return { userTokens: updateToken, exist: true };
-      } else {
-        const user = await this.PrismaService.userTokens.create({
-          data: {
-            name: payload.name,
-            email: payload.email,
-            idToken: createTokenDto.token,
-            photo: payload.picture,
-          },
-        });
-        return { userTokens: user, exist: false };
-      }
+      return {
+        name: payload.name,
+        email: payload.email,
+        idToken: createTokenDto.token,
+        photo: payload.picture,
+      };
     } catch (e) {
       throw new Error(e);
+    }
+  }
+
+  async login(
+    userInfo: CreateTokenUserDto,
+  ): Promise<{ userTokens: UserTokens; exist: boolean }> {
+    const existToken = await this.PrismaService.userTokens.findUnique({
+      where: { email: userInfo.email },
+    });
+
+    if (existToken) {
+      const updateToken = await this.PrismaService.userTokens.update({
+        where: {
+          email: userInfo.email,
+        },
+        data: {
+          name: userInfo.name,
+          idToken: userInfo.idToken,
+          photo: userInfo.photo,
+        },
+      });
+      return { userTokens: updateToken, exist: true };
+    } else {
+      const user = await this.PrismaService.userTokens.create({
+        data: {
+          name: userInfo.name,
+          email: userInfo.email,
+          idToken: userInfo.idToken,
+          photo: userInfo.photo,
+        },
+      });
+      return { userTokens: user, exist: false };
     }
   }
 

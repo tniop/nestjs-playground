@@ -1,14 +1,19 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateTokenDto } from './dto/create-token.dto';
-import { TokenController } from './token.controller';
-import { TokenService } from './token.service';
+import { CreateTokenUserDto } from 'src/token/dto/create-token-user.dto';
+import { PrismaService } from '../../src/prisma/prisma.service';
+import { TokenController } from '../../src/token/token.controller';
+import { TokenService } from '../../src/token/token.service';
 
-const invalidToken: CreateTokenDto = {
-  token: 'invalid_token',
+const userInfo: CreateTokenUserDto = {
+  email: 'controller_test@test.com',
+  name: 'controller_test',
+  idToken: 'controller_test_token',
+  photo: 'controller_test_photo_url',
 };
+
+const validateSuccess = jest.fn().mockResolvedValue(userInfo);
 
 describe('TokenController', () => {
   let controller: TokenController;
@@ -43,7 +48,7 @@ describe('TokenController', () => {
   describe('create', () => {
     it('should fail if invalid id token', async () => {
       try {
-        await controller.create(invalidToken);
+        await controller.login({ token: 'invalid_token' });
       } catch (e) {
         expect(e.message).toEqual(
           'Error: Wrong number of segments in token: invalid_token',
