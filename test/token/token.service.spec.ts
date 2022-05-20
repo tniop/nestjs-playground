@@ -12,7 +12,15 @@ const userInfo: CreateTokenUserDto = {
   photo: 'service_test_photo_url',
 };
 
-const validateSuccess = jest.fn().mockResolvedValue(userInfo);
+const existUserInfo: CreateTokenUserDto = {
+  email: 'service_test@test.com',
+  name: 'update_service_test',
+  idToken: 'update_service_test_token',
+  photo: 'update_service_test_photo_url',
+};
+
+const newUser = jest.fn().mockResolvedValue(userInfo);
+const existUser = jest.fn().mockResolvedValue(existUserInfo);
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -45,34 +53,34 @@ describe('TokenService', () => {
 
   describe('login', () => {
     it('should create a user if user email not exist', async () => {
-      const result = await service.login(await validateSuccess());
+      const result = await service.login(await newUser());
       const users = await service.findOne(userInfo.email);
 
       expect(result.userTokens.id).toEqual(users.id);
       expect(result.userTokens.name).toEqual(userInfo.name);
       expect(result.userTokens.email).toEqual(userInfo.email);
+      expect(result.userTokens.photo).toEqual(userInfo.photo);
       expect(result.exist).toEqual(false);
     });
 
     it('should update if user email exists', async () => {
-      const existUserInfo: CreateTokenUserDto = {
-        email: 'service_test@test.com',
-        name: 'update_service_test',
-        idToken: 'update_service_test_token',
-        photo: 'update_service_test_photo_url',
-      };
-      await service.login(await validateSuccess());
+      await service.login(await existUser());
       const result = await service.login(existUserInfo);
+      const users = await service.findOne(userInfo.email);
 
+      expect(result.userTokens.id).toEqual(users.id);
+      expect(result.userTokens.name).toEqual(existUserInfo.name);
+      expect(result.userTokens.email).toEqual(existUserInfo.email);
+      expect(result.userTokens.photo).toEqual(existUserInfo.photo);
       expect(result.exist).toEqual(true);
     });
 
     it('should fail if invalid id token', async () => {
       try {
-        await service.validate({ token: 'invalid_token' });
+        await service.validate({ token: 'invalid_id_token' });
       } catch (e) {
         expect(e.message).toEqual(
-          'Error: Wrong number of segments in token: invalid_token',
+          'Error: Wrong number of segments in token: invalid_id_token',
         );
       }
     });
@@ -80,6 +88,7 @@ describe('TokenService', () => {
 
   describe('findAll', () => {
     it('should return an array of users', async () => {
+      await service.login(await newUser());
       const result = await service.findAll();
       expect(result).toBeInstanceOf(Array);
     });
@@ -87,7 +96,7 @@ describe('TokenService', () => {
 
   describe('findOne', () => {
     it('should return a user', async () => {
-      await service.login(await validateSuccess());
+      await service.login(await newUser());
       const result = await service.findOne(userInfo.email);
 
       expect(result.id).toBeDefined();
@@ -107,7 +116,7 @@ describe('TokenService', () => {
 
   describe('deleteUser', () => {
     it('should delete a user', async () => {
-      await service.login(await validateSuccess());
+      await service.login(await newUser());
       const beforeDelete = (await service.findAll()).length;
       await service.deleteUser(userInfo.email);
       const afterDelete = (await service.findAll()).length;

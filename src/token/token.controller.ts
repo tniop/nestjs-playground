@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Body, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  UseInterceptors,
+} from '@nestjs/common';
 import { TokenService } from './token.service';
 import { CreateTokenRequestDto } from './dto/create-token-request.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserTokens } from '@prisma/client';
+import { TimeoutInterceptor } from '../interceptor/timeout.interceptor';
 
 @ApiTags('Token')
 @Controller('token')
@@ -10,6 +18,7 @@ export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 
   @Post()
+  @UseInterceptors(TimeoutInterceptor)
   @ApiOperation({
     summary: '유저 생성 API',
     description: 'token으로 유저를 생성한다.',
