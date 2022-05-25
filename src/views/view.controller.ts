@@ -15,4 +15,10 @@ export class ViewController {
   async getMain() {
     return {};
   }
+
+  @Get('/before')
+  @Render('before')
+  async getBefore() {
+    return {};
+  }
 }
