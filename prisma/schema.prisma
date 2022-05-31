@@ -31,3 +31,12 @@ model UserTokens {
   
   @@map("user_tokens")
 }
+
+model Files {
+  id      Int     @id @default(autoincrement())
+  name    String
+  version String
+  file    Bytes   @db.Blob
+
+  @@map("files")
+}
