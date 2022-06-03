@@ -20,4 +20,13 @@ export class FilesService {
     });
     return files;
   }
+
+  async download(id: number) {
+    const file = await this.PrismaService.files.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return file.file;
+  }
 }

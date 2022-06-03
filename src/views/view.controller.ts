@@ -21,4 +21,10 @@ export class ViewController {
   async getBefore() {
     return {};
   }
+
+  @Get('/download')
+  @Render('download')
+  async getDownload() {
+    return {};
+  }
 }

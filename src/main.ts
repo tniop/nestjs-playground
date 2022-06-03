@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
 import { setupSwagger } from 'src/util/swagger';
@@ -12,8 +12,8 @@ import * as basicAuth from 'express-basic-auth';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.useStaticAssets(join(__dirname, '..', 'src', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'src', 'views'));
+  app.useStaticAssets(resolve('./src/public'));
+  app.setBaseViewsDir(resolve('./src/views'));
   app.setViewEngine('ejs');
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
