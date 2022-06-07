@@ -36,7 +36,7 @@ model Files {
   id      Int     @id @default(autoincrement())
   name    String
   version String
-  file    Bytes   @db.Blob
+  file    Bytes   @db.LongBlob
 
   @@map("files")
 }

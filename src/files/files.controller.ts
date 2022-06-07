@@ -2,21 +2,17 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   UseInterceptors,
   UploadedFile,
   Res,
-  StreamableFile,
+  Header,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
 import { CreateFileDto } from './dto/create-file.dto';
-import { createReadStream } from 'fs';
-import { join } from 'path';
+import { Response } from 'express';
 
 @Controller('files')
 export class FilesController {
@@ -29,26 +25,30 @@ export class FilesController {
     description: '파일 업로드 후 저장한다.',
   })
   @ApiCreatedResponse({ description: '파일 업로드 후 저장한다.' })
-  uploadFile(
+  async uploadFile(
     @UploadedFile()
     file: Express.Multer.File,
   ): Promise<CreateFileDto> {
-    return this.filesService.create(file);
+    const fileData = await this.filesService.create(file);
+    console.log(fileData);
+    return fileData;
   }
 
   @Get(':id')
-  async downloadFile(@Param('id') id: number, @Res() res) {
-    console.log(await this.filesService.download(id));
-    // return await res.download(this.filesService.download(id)+'test');
-  }
-
-  @Get()
-  getFile(@Res() res): StreamableFile {
-    const file = createReadStream(join(process.cwd(), 'package.json'));
-    res.set({
-      'Content-Type': 'application/json',
-      'Content-Disposition': 'attachment; filename="package.json"',
-    });
-    return new StreamableFile(file);
+  @ApiOperation({
+    summary: '파일 다운로드 API',
+    description: '파일 다운로드',
+  })
+  @ApiCreatedResponse({ description: '파일 다운로드' })
+  async downloadFile(
+    @Param('id') id: number,
+    @Res() res: Response,
+  ): Promise<any> {
+    const fileData = await this.filesService.download(id);
+    console.log(fileData);
+    console.log('##### ##### ##### #####');
+    const fileBuffer = fileData.file;
+    console.log(fileData.file);
+    res.status(200).send(fileBuffer);
   }
 }

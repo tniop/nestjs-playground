@@ -27,6 +27,6 @@ export class FilesService {
         id: id,
       },
     });
-    return file.file;
+    return file;
   }
 }

@@ -1,25 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Download</title>
+    <%- include ('common') %>
+    <title>upload & download</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script>
+      $(document).ready(() => {
+        console.log('enter file page.');
+      });
+
+      function uploadFile() {
+        const file = document.getElementById('file').files[0];
+        const formData = new FormData();
+
+        formData.append('file', file);
+
+        if (window.confirm('등록 하시겠습니까?')) {
+          $.ajax({
+            type: 'POST',
+            url: '/files',
+            traditional: true,
+            contentType: false,
+            processData: false,
+            data: formData,
+            success: function (response) {
+              alert('등록에 성공하였습니다!');
+            },
+            error: function (error) {
+              alert(error.responseJSON.errorMessage);
+            },
+          });
+        }
+      }
+
+      function downloadFile() {
+        const fileId = $('#fileId').val();
+        axios({
+          url: `/files/${fileId}`,
+          method: 'GET',
+          responseType: 'blob',
+        }).then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'file.txt');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      }
+    </script>
   </head>
-
   <body>
-    <br />
+    <div>
+      <label>파일 등록 : </label>
+      <input type="file" id="file" />
+      <button type="button" onclick="uploadFile()">Upload</button>
 
-    <!-- Form to handle single file download request-->
-    <form action="/single" method="get">
-      <button type="submit">Download Single File</button>
-    </form>
-
-    <br /><br />
-
-    <!-- Form to handle single file download request-->
-    <form action="/files" method="get">
-      <button type="submit">Download Multiple File</button>
-    </form>
+      <input type="text" id="fileId" />
+      <button type="button" onclick="downloadFile()">Download</button>
+    </div>
   </body>
 </html>
