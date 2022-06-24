@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include ('common') %>
+    <title>Login</title>
+
+    <script></script>
+  </head>
+
+  <body>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+      function handleCredentialResponse(response) {
+        const token = response.credential;
+        console.log('Encoded JWT ID token: ' + token);
+        $.ajax({
+          type: 'POST',
+          url: `/token`,
+          data: {
+            token,
+          },
+          success: (res) => {
+            console.log(res);
+            console.log(res.data.userTokens.email);
+            console.log(res.data.exist);
+            if (res.data.exist) alert('already exist user. update it!');
+            else alert('create user!');
+          },
+          error: (err) => {
+            alert(err.responseJSON.errorMessage);
+          },
+        });
+      }
+      window.onload = function () {
+        google.accounts.id.initialize({
+          client_id:
+            '727183764673-adrqnjvlosaistplqq6l5r50bq6tj5pc.apps.googleusercontent.com',
+          callback: handleCredentialResponse,
+        });
+        google.accounts.id.renderButton(document.getElementById('buttonDiv'), {
+          theme: 'outline',
+          size: 'large',
+        });
+        google.accounts.id.prompt(); // 동기화 안내창 팝업
+      };
+    </script>
+    <div id="buttonDiv"></div>
+  </body>
+</html>
